@@ -3,14 +3,16 @@ const mongoose = require("mongoose");
 const commentSchema = mongoose.Schema({
 
   user: {
-    type: String,
-    maxlaength: 50,
+    type: String
   },
   password: {
     type: String,  
-    minlength: 5,
+    minlength: 4
   },
   content: {
+    type : String
+  },
+  postId : {
     type : String
   }
 
