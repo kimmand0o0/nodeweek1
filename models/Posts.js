@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Schema = require('mongoose').Schema;
 
 const postSchema = mongoose.Schema({
 
@@ -7,7 +8,7 @@ const postSchema = mongoose.Schema({
   },
   password: {
     type: String,  
-    minlength: 5,
+    minlength: 4,
   },
   title: {
     type : String
@@ -15,6 +16,7 @@ const postSchema = mongoose.Schema({
   content: {
     type : String
   }
+
 },{
   timestamps: true
 });
