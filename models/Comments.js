@@ -6,8 +6,8 @@ const commentSchema = mongoose.Schema({
     type: String
   },
   password: {
-    type: String,  
-    minlength: 4
+    type: String,
+    required: true
   },
   content: {
     type : String

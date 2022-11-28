@@ -20,9 +20,9 @@ router.post("/posts", async (req, res) => {
 
     // body값이 들어오지 않을 경우
 
-    // 비밀번호가 지정보다 작을 경우
-    if (req.body.password < 4) {
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
+    // 비밀번호 값을 입력하지 않은 경우
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
     }
 
     // DB 등록되는 입력값
@@ -136,6 +136,10 @@ router.put("/posts/:_postId", async (req, res) => {
     const { title } = req.body;
     const { content } = req.body;
 
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
+
     const changePost = await Posts.findOne({ _id: postId });
 
     // 바꿀 게시글 정보를 못 찾을 경우
@@ -186,6 +190,10 @@ router.delete("/posts/:_postId", async (req, res) => {
 
     const password = req.body.password;
 
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
+
     const delPost = await Posts.findOne({ _id: postId });
 
     // 값을 못찾을 경우
@@ -201,8 +209,6 @@ router.delete("/posts/:_postId", async (req, res) => {
     //모두 통과하면 게시글을 지움
     await Posts.deleteOne({ _id: postId });
     return res.status(200).json({ message: "게시글을 삭제하였습니다." });
-
-    
   } catch (error) {
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
   }

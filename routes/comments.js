@@ -26,6 +26,10 @@ router.post("/comments/:_postId", async (req, res) => {
     const { user } = req.body;
     const { content } = req.body;
 
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
+
     // id 정보에 맞는 게시글을 가져온다.
     const post = await Posts.findOne({ postId: postId });
 
@@ -108,6 +112,10 @@ router.put("/comments/:_commentId", async (req, res) => {
     const { password } = req.body;
     const { content } = req.body;
 
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
+
     // id에 맞는 댓글 정보 하나를 불러온다.
     const changeComment = await Comments.findOne({ _id: commentId });
 
@@ -155,6 +163,10 @@ router.delete("/comments/:_commentId", async (req, res) => {
     }
 
     const password = req.body.password;
+
+    if (password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
 
     // id에 맞는 정보 하나를 불러온다.
     const delComment = await Comments.findOne({ _id: commentId });

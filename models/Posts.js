@@ -7,8 +7,8 @@ const postSchema = mongoose.Schema({
     type: String
   },
   password: {
-    type: String,  
-    minlength: 4,
+    type: String,
+    required: true
   },
   title: {
     type : String
