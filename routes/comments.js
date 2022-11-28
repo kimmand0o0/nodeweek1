@@ -29,6 +29,9 @@ router.post("/comments/:_postId", async (req, res) => {
     if (password == undefined) {
       return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
     }
+    if (content == undefined) {
+      return res.status(400).json({ msg: "댓글 내용을 입력해주세요." });
+    }
 
     // id 정보에 맞는 게시글을 가져온다.
     const post = await Posts.findOne({ postId: postId });
@@ -114,6 +117,9 @@ router.put("/comments/:_commentId", async (req, res) => {
 
     if (password == undefined) {
       return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    }
+    if (content == undefined) {
+      return res.status(400).json({ msg: "댓글 내용을 입력해주세요." });
     }
 
     // id에 맞는 댓글 정보 하나를 불러온다.
