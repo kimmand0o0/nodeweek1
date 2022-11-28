@@ -49,7 +49,7 @@ router.post("/posts", async (req, res) => {
 router.get("/posts", async (req, res) => {
   try {
     // 모든 post를 불러옴
-    const posts = await Posts.find({});
+    const posts = await Posts.find({}).sort({ createdAt : - 1 });
 
     // map 함수를 통해 원하는 정보만 가져옴
     const data = posts.map((post) => {
