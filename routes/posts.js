@@ -6,8 +6,6 @@ const Posts = require("../models/Posts");
 //==================================
 //
 //            게시글 작성
-//       postman 구현 확인 완료
-//     비밀번호 암호화가 필요할지...? > 과제에는 없지만 해봐도 좋음
 //
 //==================================
 router.post("/posts", async (req, res) => {
@@ -19,10 +17,8 @@ router.post("/posts", async (req, res) => {
     const { title } = req.body;
 
     // body값이 들어오지 않을 경우
-
-    // 비밀번호 값을 입력하지 않은 경우
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    if (req.body.length == undefined) {
+      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
     }
 
     // DB 등록되는 입력값
@@ -33,8 +29,9 @@ router.post("/posts", async (req, res) => {
       content: content,
     });
 
-    res.status(200).json({ message: "게시글을 생성하였습니다." });
+    return res.status(200).json({ message: "게시글을 생성하였습니다." });
   } catch (error) {
+    console.error("Catch 에러 발생!!");
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
   }
 });
@@ -49,7 +46,8 @@ router.post("/posts", async (req, res) => {
 router.get("/posts", async (req, res) => {
   try {
     // 모든 post를 불러옴
-    const posts = await Posts.find({}).sort({ createdAt : - 1 });
+    // sort 이용해 내림차순 정렬
+    const posts = await Posts.find({}).sort({ createdAt: -1 });
 
     // map 함수를 통해 원하는 정보만 가져옴
     const data = posts.map((post) => {
@@ -63,10 +61,9 @@ router.get("/posts", async (req, res) => {
 
     // 리스폰으로 데이터를 불러옴.
     // 데이터는 위에 지정해준 값
-    res.json({
-      data,
-    });
+    return res.json({ data });
   } catch (error) {
+    console.error("Catch 에러 발생!!");
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
   }
 });
@@ -84,12 +81,6 @@ router.get("/posts/:_postId", async (req, res) => {
     // params를 통해 id 값을 가져옴
     let postId = req.params._postId;
 
-    // Params가 잘못되었을 경우
-    if (postId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
-
     // 상세 페이지이기 때문에 한가지 정보만 가져오기
     const post = await Posts.findOne({ _id: postId });
     //id에 맞는 정보가 없을 경우
@@ -98,17 +89,12 @@ router.get("/posts/:_postId", async (req, res) => {
     }
 
     // 원하는 정보만 찍어주기
-    const data = {
+    res.status(200).json({
       postId: post._id,
       user: post.user,
       title: post.title,
       content: post.content,
       createdAt: post.createdAt,
-    };
-
-    // 데이터 가져오기
-    return res.status(200).json({
-      data,
     });
   } catch (error) {
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
@@ -126,30 +112,24 @@ router.put("/posts/:_postId", async (req, res) => {
   try {
     let postId = req.params._postId;
 
-    // Params가 잘못되었을 경우
-    if (postId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
-
     const { password } = req.body;
     const { title } = req.body;
     const { content } = req.body;
 
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
+    if (title == undefined && content == undefined) {
+      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
     }
 
     const changePost = await Posts.findOne({ _id: postId });
 
     // 바꿀 게시글 정보를 못 찾을 경우
     if (changePost == null || changePost.length === 0) {
-      return res.status(400).json({ msg: "게시글 조회에 실패하였습니다." });
+      return res.status(404).json({ msg: "게시글 조회에 실패하였습니다." });
     }
 
     // 비밀번호가 다를 경우
-    if (password !== changePost.password) {
-      return res.status(400).json({ msg: "비밀번호를 확인 해주세요." });
+    if (password !== changePost.password || password == undefined) {
+      return res.status(400).json({ msg: "비밀번호를 확인해주세요." });
     }
 
     // 비밀번호가 같을 경우에만 변경
@@ -164,9 +144,8 @@ router.put("/posts/:_postId", async (req, res) => {
           },
         }
       );
+      return res.status(200).json({ msg: "게시글을 수정하였습니다." });
     }
-
-    res.status(200).json({ msg: "게시글을 수정하였습니다." });
   } catch (error) {
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
   }
@@ -181,18 +160,7 @@ router.put("/posts/:_postId", async (req, res) => {
 router.delete("/posts/:_postId", async (req, res) => {
   try {
     let postId = req.params._postId;
-
-    // Params가 잘못되었을 경우
-    if (postId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
-
     const password = req.body.password;
-
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
-    }
 
     const delPost = await Posts.findOne({ _id: postId });
 
@@ -202,7 +170,7 @@ router.delete("/posts/:_postId", async (req, res) => {
     }
 
     // 비밀번호가 다를 경우
-    if (delPost.password !== password) {
+    if (delPost.password !== password || password == undefined ) {
       return res.status(400).json({ message: "비밀번호를 확인 해주세요." });
     }
 

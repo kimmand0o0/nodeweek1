@@ -16,29 +16,17 @@ router.post("/comments/:_postId", async (req, res) => {
     // params로 게시글 id 값을 가져온다
     let postId = req.params._postId;
 
-    // Params가 잘못되었을 경우
-    if (postId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
-
+    // body 값들을 사용하기 좋게 정리한다.
     const { password } = req.body;
     const { user } = req.body;
     const { content } = req.body;
-
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
-    }
-    if (content == undefined) {
-      return res.status(400).json({ msg: "댓글 내용을 입력해주세요." });
-    }
 
     // id 정보에 맞는 게시글을 가져온다.
     const post = await Posts.findOne({ postId: postId });
 
     // 게시글을 찾지 못할 경우
     if (post == null || post.length === 0) {
-      return res.status(400).json({ msg: "게시글을 찾을 수 없습니다." });
+      return res.status(404).json({ msg: "게시글을 찾을 수 없습니다." });
     }
 
     // DB에 등록되는 입력값
@@ -65,11 +53,6 @@ router.get("/comments/:_postId", async (req, res) => {
   try {
     // params를 통해 게시글 id 값을 가져옴
     let postId = req.params._postId;
-    // Params가 잘못되었을 경우
-    if (postId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
 
     // id 정보에 맞는 댓글 정보를 가져온다.
     const comments = await Comments.find({ postId: postId });
@@ -106,18 +89,10 @@ router.put("/comments/:_commentId", async (req, res) => {
   try {
     // params를 통해 댓글 id 값을 가져옴
     let commentId = req.params._commentId;
-    // Params가 잘못되었을 경우
-    if (commentId.length !== 24) {
-      commentId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
 
     const { password } = req.body;
     const { content } = req.body;
-
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
-    }
+    
     if (content == undefined) {
       return res.status(400).json({ msg: "댓글 내용을 입력해주세요." });
     }
@@ -131,7 +106,7 @@ router.put("/comments/:_commentId", async (req, res) => {
     }
 
     // 비밀번호가 맞지 않는 경우
-    if (password !== changeComment.password) {
+    if (password !== changeComment.password || password == undefined ) {
       return res.status(400).json({ msg: "비밀번호를 확인 해주세요." });
     }
 
@@ -145,9 +120,10 @@ router.put("/comments/:_commentId", async (req, res) => {
           },
         }
       );
+      return res.status(200).json({ msg: "댓글을 수정하였습니다." });
     }
 
-    res.status(200).json({ msg: "댓글을 수정하였습니다." });
+    
   } catch (error) {
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
   }
@@ -162,17 +138,8 @@ router.delete("/comments/:_commentId", async (req, res) => {
   try {
     // 코멘트 id를 받아옴
     let commentId = req.params._commentId;
-    // Params가 잘못되었을 경우
-    if (commentId.length !== 24) {
-      postId = "000000000000000000000000";
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
 
     const password = req.body.password;
-
-    if (password == undefined) {
-      return res.status(400).json({ msg: "비밀번호를 입력해주세요." });
-    }
 
     // id에 맞는 정보 하나를 불러온다.
     const delComment = await Comments.findOne({ _id: commentId });
@@ -183,7 +150,7 @@ router.delete("/comments/:_commentId", async (req, res) => {
     }
     
     // 비밀번호가 다를 경우
-    if (delComment.password !== password) {
+    if (delComment.password !== password || password == undefined ) {
       return res.status(400).json({ message: "비밀번호를 확인 해주세요." });
     }
 
