@@ -16,11 +16,6 @@ router.post("/posts", async (req, res) => {
     const { content } = req.body;
     const { title } = req.body;
 
-    // body값이 들어오지 않을 경우
-    if (req.body.length == undefined) {
-      return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
-    }
-
     // DB 등록되는 입력값
     await Posts.create({
       user: user,
