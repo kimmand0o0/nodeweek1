@@ -113,7 +113,7 @@ router.put("/comments/:_commentId", async (req, res) => {
     // 비밀번호가 맞으면 수정 해준다.
     if (password === changeComment.password) {
       await Comments.updateOne(
-        { commentId: commentId },
+        { _id: commentId },
         {
           $set: {
             content: content,

@@ -75,7 +75,7 @@ router.get("/posts/:_postId", async (req, res) => {
 
     // 상세 페이지이기 때문에 한가지 정보만 가져오기
     // {_id : {$eq: postId['_postId']}} > 쿼리연산자. 검색해보아라 김혜란
-    const post = await Posts.findOne({_id : {$eq: postId['_postId']}});
+    const post = await Posts.findOne({_id : postId});
     console.log(post)
     //id에 맞는 정보가 없을 경우
     if (post == null || post.length === 0) {
@@ -108,7 +108,7 @@ router.put("/posts/:_postId", async (req, res) => {
 
     const { password, title, content } = req.body;
 
-    if (!title && !content) {
+    if (!title || !content) {
       return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
     }
 
@@ -127,7 +127,7 @@ router.put("/posts/:_postId", async (req, res) => {
     // 비밀번호가 같을 경우에만 변경
     if (password === changePost.password) {
       await Posts.updateOne(
-        { postId: postId },
+        { _id: postId },
         {
           $set: {
             // 변경 가능한 내용은 두가지만
