@@ -11,10 +11,7 @@ const Posts = require("../models/Posts");
 router.post("/posts", async (req, res) => {
   //예상할 수 없는 err는 try catch로 잡아줌
   try {
-    const { password } = req.body;
-    const { user } = req.body;
-    const { content } = req.body;
-    const { title } = req.body;
+    const { password, user, content, title } = req.body;
 
     // DB 등록되는 입력값
     await Posts.create({
@@ -23,8 +20,8 @@ router.post("/posts", async (req, res) => {
       title: title,
       content: content,
     });
-
     return res.status(200).json({ message: "게시글을 생성하였습니다." });
+    
   } catch (error) {
     console.error("Catch 에러 발생!!");
     return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
@@ -77,7 +74,9 @@ router.get("/posts/:_postId", async (req, res) => {
     let postId = req.params._postId;
 
     // 상세 페이지이기 때문에 한가지 정보만 가져오기
-    const post = await Posts.findOne({ _id: postId });
+    // {_id : {$eq: postId['_postId']}} > 쿼리연산자. 검색해보아라 김혜란
+    const post = await Posts.findOne({_id : {$eq: postId['_postId']}});
+    console.log(post)
     //id에 맞는 정보가 없을 경우
     if (post == null || post.length === 0) {
       return res.status(400).json({ msg: "게시글 조회에 실패하였습니다." });
@@ -107,11 +106,9 @@ router.put("/posts/:_postId", async (req, res) => {
   try {
     let postId = req.params._postId;
 
-    const { password } = req.body;
-    const { title } = req.body;
-    const { content } = req.body;
+    const { password, title, content } = req.body;
 
-    if (title == undefined && content == undefined) {
+    if (!title && !content) {
       return res.status(400).json({ msg: "데이터 형식이 올바르지 않습니다." });
     }
 
